@@ -2,10 +2,11 @@ import praw
 import pandas as pd
 # test
 
-
-reddit_read_only = praw.Reddit(client_id="Yq5U6qZg9bdz2hpfG_maWw",  # your client id
-                               client_secret="VBlf2B7eWmM27gt0CilvSLx_kQPI_Q",  # your client secret
-                               user_agent="HASS Scraping")  # your user agent
+reddit_read_only = praw.Reddit(
+    client_id="Yq5U6qZg9bdz2hpfG_maWw",  # your client id
+    client_secret="VBlf2B7eWmM27gt0CilvSLx_kQPI_Q",  # your client secret
+    user_agent="HASS Scraping"  # your user agent
+)
 
 subreddit = reddit_read_only.subreddit("democrat")
 
@@ -21,6 +22,7 @@ for post in posts:
     i += 1
     if i > count:
         break
+
     # Title of each post
     posts_dict["Title"].append(post.title)
     # Text inside a post

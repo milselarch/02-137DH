@@ -1,0 +1,3 @@
+hass_venv/*
+.idea/
+__pycache__/

@@ -2,6 +2,7 @@ import praw
 import pandas as pd
 
 from tqdm import tqdm
+from time import sleep
 
 # This file iterates through the top
 # comments of the top posts in specified subreddit
@@ -38,6 +39,7 @@ def scrape_comments(
             post_urls.append(post.url)
             comments.append(top_level_comment.body)
             pbar.set_description(f'comments: {num_comments}')
+        sleep(0.1)
 
     df = pd.DataFrame({
         'post_url': post_urls, 'post_id': post_ids,

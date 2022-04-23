@@ -18,4 +18,3 @@ def remove_keywords(
     return comments_df
 
 
-remove_keywords(['Trump', 'Biden'])

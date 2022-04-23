@@ -13,17 +13,17 @@ def scrape_comments(
     export_path='datasets/republican_comments.csv'
 ):
     post_urls, post_ids, comments = [], [], []
-    posts = subreddit.top("all")
-    count = num_posts
+    posts = subreddit.top(limit=num_posts)
+    # count = num_posts
 
     num_comments, k = 0, 0
     pbar = tqdm(range(num_posts))
 
     for post in posts:
-        k += 1
-        if k > count:
-            print('max posts reached')
-            break
+        # k += 1
+        # if k > count:
+        #     print('max posts reached')
+        #     break
 
         pbar.update(1)
         post.comment_sort = 'best'

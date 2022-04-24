@@ -5,9 +5,11 @@ import argparse
 
 class WordFinder(object):
     def __init__(
-        self, load_path='datasets/republican_comments.csv'
+        self, load_dir='datasets',
+        filename='republican_comments.csv'
     ):
-        self.df = pd.read_csv(load_path)
+        self.load_path = f'{load_dir}/{filename}'
+        self.df = pd.read_csv(self.load_path)
 
     @staticmethod
     def get_search_regex(word):
@@ -51,10 +53,16 @@ class WordFinder(object):
         print('')
         print('-' * 40)
         print(f'{num_matches} matches for [{word}]')
+        print(f'dataframe = {self.load_path}')
         print(f'span = {span}')
 
 
 if __name__ == '__main__':
+    """
+    example command:
+    python3 WordFinder.py --word republican --span 100 \
+    --df dem-comments-220424-1305.csv
+    """
     parser = argparse.ArgumentParser(description='Enter search word.')
     parser.add_argument(
         '--word', action='store', type=str,
@@ -64,8 +72,20 @@ if __name__ == '__main__':
         '--span', action='store', type=int,
         const=40, default=50, nargs='?'
     )
+    parser.add_argument(
+        '--dir', action='store', type=str,
+        const='datasets', default='datasets', nargs='?'
+    )
+    default_file = 'republican_comments.csv'
+    parser.add_argument(
+        '--df', action='store', type=str,
+        const=default_file, default=default_file, nargs='?'
+    )
 
-    finder = WordFinder()
-    # finder.show_occurrences('free', 50)
     args = parser.parse_args()
-    finder.show_occurrences(args.word, args.span)
+    finder = WordFinder(
+        load_dir=args.dir, filename=args.df
+    )
+
+    # finder.show_occurrences('free', 50)
+    finder.show_occurrences(word=args.word, span=args.span)

@@ -35,23 +35,6 @@ class Extractor(WordFinder):
             # Whether the model returns all hidden-states.
         ).to(self.device)
 
-    @staticmethod
-    def extract_sentence(comment, start_index, end_index):
-        while start_index > 0:
-            if comment[start_index] == '.':
-                start_index += 1
-                break
-
-            start_index -= 1
-
-        while end_index < len(comment) - 1:
-            if comment[end_index] == '.':
-                break
-
-            end_index += 1
-
-        return comment[start_index:end_index]
-
     def load_embeddings(self, sentence, word):
         assert '.' not in sentence
         self.load_model()

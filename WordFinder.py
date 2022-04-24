@@ -25,6 +25,23 @@ class WordFinder(object):
         return pattern
 
     @staticmethod
+    def extract_sentence(comment, start_index, end_index):
+        while start_index > 0:
+            if comment[start_index] == '.':
+                start_index += 1
+                break
+
+            start_index -= 1
+
+        while end_index < len(comment) - 1:
+            if comment[end_index] == '.':
+                break
+
+            end_index += 1
+
+        return comment[start_index:end_index]
+
+    @staticmethod
     def make_stamp():
         date = datetime.now()
         stamp = date.strftime('%y%m%d-%H%M')

@@ -1,6 +1,7 @@
 import praw
 import pandas as pd
 
+from datetime import datetime
 from tqdm import tqdm
 from time import sleep
 
@@ -11,12 +12,17 @@ from time import sleep
 
 def scrape_comments(
     subreddit, comment_limit, num_posts,
-    export_path='datasets/republican_comments.csv'
+    export_dir='datasets', export_name='rep_comments',
+    stamp=None
 ):
-    post_urls, post_ids, comments = [], [], []
+    if stamp is None:
+        date = datetime.now()
+        stamp = date.strftime('%Y%m%d-%H%M%S')
+
+    post_urls, post_ids = [], []
+    comments, comment_ids = [], []
     posts = subreddit.top(limit=num_posts)
     # count = num_posts
-
     num_comments, k = 0, 0
     pbar = tqdm(range(num_posts))
 
@@ -30,22 +36,25 @@ def scrape_comments(
         post.comment_sort = 'best'
         post.comment_limit = comment_limit
 
-        for top_level_comment in post.comments:
+        for comment in post.comments:
             num_comments += 1
-            if isinstance(top_level_comment, praw.models.MoreComments):
+            if isinstance(comment, praw.models.MoreComments):
                 continue
 
             post_ids.append(post.id)
             post_urls.append(post.url)
-            comments.append(top_level_comment.body)
+            comments.append(comment.body)
+            comment_ids.append(comment.id)
             pbar.set_description(f'comments: {num_comments}')
+
         sleep(0.1)
 
     df = pd.DataFrame({
         'post_url': post_urls, 'post_id': post_ids,
-        'comment': comments
+        'comment': comments, 'comment_id': comment_ids
     })
 
+    export_path = f'{export_dir}/{export_name}-{stamp}.csv'
     df.to_csv(export_path, index=False)
     print(f'exported to {export_path}')
 
@@ -56,7 +65,11 @@ reddit_read_only = praw.Reddit(
     user_agent="HASS Scraping"  # your user agent
 )
 
-max_posts = 5000
-max_comments = 100
-rep_subreddit = reddit_read_only.subreddit("republican")
-scrape_comments(rep_subreddit, max_comments, max_posts)
+if __name__ == '__main__':
+    max_posts = 5000
+    max_comments = 250
+    rep_subreddit = reddit_read_only.subreddit("republican")
+    scrape_comments(
+        rep_subreddit, max_comments, max_posts,
+        export_name='rep_comments'
+    )

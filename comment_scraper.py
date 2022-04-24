@@ -17,7 +17,10 @@ def scrape_comments(
 ):
     if stamp is None:
         date = datetime.now()
-        stamp = date.strftime('%Y%m%d-%H%M%S')
+        stamp = date.strftime('%y%m%d-%H%M')
+
+    export_path = f'{export_dir}/{export_name}-{stamp}.csv'
+    print(f'export path = {export_path}')
 
     post_urls, post_ids = [], []
     comments, comment_ids = [], []
@@ -54,7 +57,6 @@ def scrape_comments(
         'comment': comments, 'comment_id': comment_ids
     })
 
-    export_path = f'{export_dir}/{export_name}-{stamp}.csv'
     df.to_csv(export_path, index=False)
     print(f'exported to {export_path}')
 

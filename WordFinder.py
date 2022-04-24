@@ -2,6 +2,8 @@ import re
 import pandas as pd
 import argparse
 
+from datetime import datetime
+
 
 class WordFinder(object):
     def __init__(
@@ -21,6 +23,12 @@ class WordFinder(object):
         # in the comment). (?i) means search is case-insensitive
         pattern = re.compile(f'\\s(?i){escaped_word}(\\s|$)')
         return pattern
+
+    @staticmethod
+    def make_stamp():
+        date = datetime.now()
+        stamp = date.strftime('%y%m%d-%H%M')
+        return stamp
 
     def filter_by_word(self, word):
         regex = self.get_search_regex(word)

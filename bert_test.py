@@ -53,3 +53,7 @@ with torch.no_grad():
     # swap layers and tokens dimensions
     token_embeddings = token_embeddings.permute(1, 0, 2)
     print(token_embeddings.size())
+
+    embedding = token_embeddings[12, -2, :]
+    print(embedding, embedding.size())
+    # torch.Size([209, 13, 768])

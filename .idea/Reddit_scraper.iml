@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/hass_venv/include" />
       <excludeFolder url="file://$MODULE_DIR$/hass_venv/lib" />
       <excludeFolder url="file://$MODULE_DIR$/hass_venv/share" />
+      <excludeFolder url="file://$MODULE_DIR$/hass_venv/etc" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (finals)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

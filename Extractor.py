@@ -35,6 +35,10 @@ class Extractor(WordFinder):
             # Whether the model returns all hidden-states.
         ).to(self.device)
 
+    def word_embedding(self, word):
+        # gets the embedding for a single word without context
+        return self.load_embeddings(word, word)[0]
+
     def load_embeddings(self, sentence, word):
         assert '.' not in sentence
         self.load_model()
@@ -67,8 +71,8 @@ class Extractor(WordFinder):
         for word_token_index in word_token_indexes:
             # print('WORD IDX', word_token_index, word_token_indexes)
             word_embedding = token_embeddings[
-                word_token_index, self.embeddings_layer, :
-            ]
+                             word_token_index, self.embeddings_layer, :
+                             ]
 
             word_embedding = torch.flatten(word_embedding)
             np_embedding = word_embedding.cpu().detach().numpy()
@@ -119,26 +123,28 @@ class Extractor(WordFinder):
         return all_embeddings, all_comment_ids
 
     def extract_embeddings(
-        self, word, export_dir='extractions'
+            self, word, export_dir='extractions', export=True
     ):
         stamp = self.make_stamp()
         embeddings, comment_ids = self.get_embeddings(word)
         export_path = f'{export_dir}/extract-{stamp}.npy'
 
-        np.save(export_path, {
-            'filepath': self.load_path,
-            'embeddings': embeddings,
-            'comment_ids': comment_ids,
-            'stamp': stamp
-        })
+        if export:
+            np.save(export_path, {
+                'filepath': self.load_path,
+                'embeddings': embeddings,
+                'comment_ids': comment_ids,
+                'target_word': word,
+                'stamp': stamp
+            })
 
-        print(f'exported embeddings to {export_path}')
+            print(f'exported embeddings to {export_path}')
 
 
 if __name__ == '__main__':
     extractor = Extractor()
-    sentence = 'This is a test sentence, ' \
-               'and this is a test of my resolve as well'
+    test_sentence = 'This is a test sentence, ' \
+                    'and this is a test of my resolve as well'
 
-    word_vectors = extractor.load_embeddings(sentence, 'test')
+    word_vectors = extractor.load_embeddings(test_sentence, 'test')
     print(len(word_vectors), word_vectors[0].shape)

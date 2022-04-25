@@ -5,4 +5,4 @@ from datetime import datetime
 
 filename = 'dem-comments-220424-1305.csv'
 extractor = Extractor(filename=filename)
-extractor.extract_embeddings('republican')
+extractor.extract_embeddings('fascist', export=True)

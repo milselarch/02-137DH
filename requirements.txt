@@ -10,3 +10,4 @@ transformers==4.18.0
 torch==1.7.1+cu110
 torchvision==0.8.2+cu110
 numpy==1.22.3
+sklearn==0.0

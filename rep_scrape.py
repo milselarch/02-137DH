@@ -2,8 +2,8 @@ from comment_scraper import *
 
 max_posts = 5000
 max_comments = 250
-rep_subreddit = reddit_read_only.subreddit("democrats")
+rep_subreddit = reddit_read_only.subreddit("Republican")
 scrape_comments(
     rep_subreddit, max_comments, max_posts,
-    export_name='dem-nobot'
+    export_name='rep-nobot'
 )

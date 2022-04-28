@@ -123,7 +123,7 @@ class Extractor(WordFinder):
         return all_embeddings, all_comment_ids
 
     def extract_embeddings(
-            self, word, export_dir='extractions', export=True
+        self, word, export_dir='extractions', export=True
     ):
         stamp = self.make_stamp()
         embeddings, comment_ids = self.get_embeddings(word)
@@ -139,6 +139,38 @@ class Extractor(WordFinder):
             })
 
             print(f'exported embeddings to {export_path}')
+        else:
+            print('embeddings not exported')
+
+    def read_embeddings(self, word):
+        embeddings, comment_ids = self.get_embeddings(word)
+        return dict(
+            target_word=word,
+            embeddings=embeddings,
+            comment_ids=comment_ids
+        )
+
+    def extract_all(
+        self, words, export_dir='extractions', export=True
+    ):
+        stamp = self.make_stamp()
+        export_path = f'{export_dir}/extracts-{stamp}.npy'
+        extractions = {}
+
+        for word in words:
+            extraction = self.read_embeddings(word)
+            extrractions[word] = extraction
+
+        if export:
+            np.save(export_path, dict(
+                filepath=self.load_path,
+                extractions=extractions,
+                stamp=stamp
+            ))
+
+            print(f'exported embeddings to {export_path}')
+        else:
+            print('embeddings not exported')
 
 
 if __name__ == '__main__':

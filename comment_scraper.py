@@ -23,7 +23,9 @@ def scrape_comments(
     print(f'export path = {export_path}')
 
     post_urls, post_ids = [], []
-    comments, comment_ids = [], []
+    comments, comment_ids, comment_scores = [], [], []
+    subbreddit_log = []
+
     posts = subreddit.top(limit=num_posts)
     # count = num_posts
     num_comments, k = 0, 0
@@ -42,19 +44,26 @@ def scrape_comments(
         for comment in post.comments:
             num_comments += 1
             if isinstance(comment, praw.models.MoreComments):
+                # don't add nested comments
+                continue
+            if "I am a bot" in comment.body:
+                # print('BOT COMMENT')
                 continue
 
             post_ids.append(post.id)
-            post_urls.append(post.url)
+            post_urls.append(post.shortlink)
             comments.append(comment.body)
             comment_ids.append(comment.id)
+            comment_scores.append(comment.score)
+            subbreddit_log.append(comment.subreddit.title)
             pbar.set_description(f'comments: {num_comments}')
 
         sleep(0.1)
 
     df = pd.DataFrame({
         'post_url': post_urls, 'post_id': post_ids,
-        'comment': comments, 'comment_id': comment_ids
+        'comment': comments, 'comment_id': comment_ids,
+        'score': comment_scores, 'subreddit': subbreddit_log
     })
 
     df.to_csv(export_path, index=False)

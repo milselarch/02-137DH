@@ -4,10 +4,17 @@ from Extractor import Extractor
 from datetime import datetime
 
 words_list = [
+    'government', 'tyrant', 'necessity',
+    'america', 'confederate', 'martyr', 'hero',
+    'traitor', 'russia', 'china', 'justice', 'injustice',
+    'racist', 'tolerant', 'victim', 'welfare',
+    'necessary', 'need', 'want',
+
     'republican', 'democrat', 'evil', 'good',
     'healthcare', 'libertarian', 'authoritarian',
     'liberal', 'conservative', 'drugs', 'weed',
-    'cannabis', 'marijuana',
+    'cannabis', 'marijuana', 'necessity'
+
     'rights', 'right', 'left', 'freedom', 'liberty',
     'police', 'immigrants', 'immigrant', 'illegal',
     'legal', 'privilege', 'entitled', 'angry', 'lazy',

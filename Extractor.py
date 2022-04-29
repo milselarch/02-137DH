@@ -9,6 +9,10 @@ from transformers import BertTokenizer, BertModel
 from tqdm import tqdm
 
 
+class TokensTooLong(Exception):
+    pass
+
+
 class Extractor(WordFinder):
     def __init__(self, *args, **kwargs):
         super(Extractor, self).__init__(*args, **kwargs)
@@ -45,10 +49,33 @@ class Extractor(WordFinder):
 
         wrapped_comment = f"[CLS] {sentence} [SEP]"
         tokenized_text = self.tokenizer.tokenize(wrapped_comment)
+        num_tokens = len(tokenized_text)
+        bert_length = 512
+
         print(tokenized_text)
 
         np_tokenized_text = np.array(tokenized_text)
         word_token_indexes = np.where(np_tokenized_text == word)[0]
+        min_index = np.min(word_token_indexes)
+        max_index = np.max(word_token_indexes)
+
+        if num_tokens > bert_length:
+            # splice comment if it's more than 512 tokens long
+            buffer = (bert_length - 2 - (max_index - min_index)) // 2
+            start_splice = min_index - buffer
+            end_splice = max_index + buffer
+
+            # +1 for the new CLS added to the tokens
+            word_token_indexes = word_token_indexes - start_splice + 1
+            tokenized_text = ["CLS"] + tokenized_text[
+                start_splice: end_splice
+            ] + ["[SEP]"]
+
+            print(f'warning: sentence long {sentence} for {word}')
+            print(f'new indexes: {word_token_indexes}')
+
+        if len(tokenized_text) > bert_length:
+            raise TokensTooLong
 
         segments_ids = [1] * len(tokenized_text)
         segments_tensor = torch.tensor([segments_ids]).to(self.device)
@@ -71,8 +98,8 @@ class Extractor(WordFinder):
         for word_token_index in word_token_indexes:
             # print('WORD IDX', word_token_index, word_token_indexes)
             word_embedding = token_embeddings[
-                             word_token_index, self.embeddings_layer, :
-                             ]
+                 word_token_index, self.embeddings_layer, :
+            ]
 
             word_embedding = torch.flatten(word_embedding)
             np_embedding = word_embedding.cpu().detach().numpy()
@@ -115,7 +142,12 @@ class Extractor(WordFinder):
 
             for sentence in sentences:
                 print('sentence =', sentence)
-                embeddings = self.load_embeddings(sentence, word)
+                try:
+                    embeddings = self.load_embeddings(sentence, word)
+                except TokensTooLong:
+                    print(f'sentence too long: {sentence} for {word}')
+                    continue
+
                 num_words = len(embeddings)
                 all_comment_ids.extend([comment_id] * num_words)
                 all_embeddings.extend(embeddings)
@@ -151,7 +183,8 @@ class Extractor(WordFinder):
         )
 
     def extract_all(
-        self, words, export_dir='extractions', export=True
+        self, words, export_dir='extractions', export=True,
+        tag='unknown'
     ):
         stamp = self.make_stamp()
         export_path = f'{export_dir}/extracts-{stamp}.npy'
@@ -159,13 +192,13 @@ class Extractor(WordFinder):
 
         for word in words:
             extraction = self.read_embeddings(word)
-            extrractions[word] = extraction
+            extractions[word] = extraction
 
         if export:
             np.save(export_path, dict(
                 filepath=self.load_path,
                 extractions=extractions,
-                stamp=stamp
+                stamp=stamp, tag=tag
             ))
 
             print(f'exported embeddings to {export_path}')
